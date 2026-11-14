@@ -31,7 +31,7 @@ function makePdf(){
  ];
  const esc=t=>t.replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
  let y=755,cmd="BT\n";
- for(const item of lines){const line=item[0],size=item[1];if(line===""){y-=size;continue;}cmd+="/F1 "+size+" Tf 48 "+y+" Td ("+esc(line)+") Tj\n";y-=size+5;}
+ for(const item of lines){const line=item[0],size=item[1];if(line===""){y-=size;continue;}cmd+="/F1 "+size+" Tf 1 0 0 1 48 "+y+" Tm ("+esc(line)+") Tj\n";y-=size+5;}
  cmd+="ET";
  const objects=[];
  objects[1]="<< /Type /Catalog /Pages 2 0 R >>";
