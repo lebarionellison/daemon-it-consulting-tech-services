@@ -123,7 +123,7 @@ async function recordApproval(request, env) {
 
 async function handleLead(request, env) {
   if (!sameOrigin(request)) return json({ error: "Origin not allowed." }, 403);
-  if (!env.DB) return json({ error: "Lead storage is being configured. Please try again shortly." }, 503);
+  if (!env.DB) return json({ error: "Lead storage is not configured." }, 503);
   if (!(request.headers.get("Content-Type") || "").toLowerCase().includes("application/json")) {
     return json({ error: "JSON required." }, 415);
   }
@@ -132,11 +132,12 @@ async function handleLead(request, env) {
   if (String(body.website || "").trim()) return json({ ok: true }); // honeypot
   const name = clean(body.name, 120);
   const email = clean(body.email, 254).toLowerCase();
-  const company = clean(body.company, 160);
-  const pain = clean(body.pain, 3000);
   const requestType = clean(body.requestType || "Pilot inquiry", 80);
-  if (!name || !company || !pain || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return json({ error: "Please complete all fields with a valid email address." }, 400);
+  const isQuickExecutiveRequest = requestType === "Executive Brief + Capability Statement";
+  const company = clean(body.company || (isQuickExecutiveRequest ? "Executive brief request" : ""), 160);
+  const pain = clean(body.pain || (isQuickExecutiveRequest ? "Please send the DAEMON ACE Executive Brief and Capability Statement." : ""), 3000);
+  if (!name || !company || !pain || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    return json({ error: "Please complete all required fields with a valid email address." }, 400);
   }
   await env.DB.prepare(
     "INSERT INTO leads (name, email, company, request_type, pain, status, created_at) VALUES (?, ?, ?, ?, ?, 'new', datetime('now'))"
