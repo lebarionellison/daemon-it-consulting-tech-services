@@ -136,7 +136,7 @@ async function handleLead(request, env) {
   const isQuickExecutiveRequest = requestType === "Executive Brief + Capability Statement";
   const company = clean(body.company || (isQuickExecutiveRequest ? "Executive brief request" : ""), 160);
   const pain = clean(body.pain || (isQuickExecutiveRequest ? "Please send the DAEMON ACE Executive Brief and Capability Statement." : ""), 3000);
-  if (!name || !company || !pain || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+  if (!name || !company || !pain || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ error: "Please complete all required fields with a valid email address." }, 400);
   }
   await env.DB.prepare(
